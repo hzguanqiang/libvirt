@@ -4449,6 +4449,45 @@ cleanup:
 }
 
 
+static int lxcDomainLxcEnterNamespace(virDomainPtr domain,
+                                      unsigned int nfdlist,
+                                      int *fdlist,
+                                      unsigned int *noldfdlist,
+                                      int **oldfdlist,
+                                      unsigned int flags)
+{
+    size_t i;
+
+    virCheckFlagsGoto(0, error);
+
+    if (noldfdlist && oldfdlist) {
+        size_t nfds;
+        if (virProcessGetNamespaces(getpid(),
+                                    &nfds,
+                                    oldfdlist) < 0)
+            goto error;
+        *noldfdlist = nfds;
+    }
+
+    if (virProcessSetNamespaces(nfdlist, fdlist) < 0) {
+        if (oldfdlist && noldfdlist) {
+            for (i = 0; i < *noldfdlist; i++) {
+                VIR_FORCE_CLOSE((*oldfdlist)[i]);
+            }
+            VIR_FREE(*oldfdlist);
+            *noldfdlist = 0;
+        }
+        goto error;
+    }
+
+    return 0;
+
+error:
+    virDispatchError(domain->conn);
+    return -1;
+}
+
+
 static char *
 lxcConnectGetSysinfo(virConnectPtr conn, unsigned int flags)
 {
@@ -4671,6 +4710,7 @@ static virDriver lxcDriver = {
     .domainShutdownFlags = lxcDomainShutdownFlags, /* 1.0.1 */
     .domainReboot = lxcDomainReboot, /* 1.0.1 */
     .domainLxcOpenNamespace = lxcDomainLxcOpenNamespace, /* 1.0.2 */
+    .domainLxcEnterNamespace = lxcDomainLxcEnterNamespace, /* 1.1.2 */
 };
 
 static virStateDriver lxcStateDriver = {

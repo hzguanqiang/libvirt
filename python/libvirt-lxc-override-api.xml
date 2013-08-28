@@ -15,5 +15,19 @@ the setns() system call.]]></info>
       <arg name='domain' type='virDomainPtr' info='a domain object'/>
       <arg name='flags' type='unsigned int' info='currently unused, pass 0'/>
     </function>
+    <function name='virDomainLxcEnterNamespace' file='python-lxc'>
+      <info><![CDATA[This API is LXC specific, so it will only work with hypervisor
+connections to the LXC driver.
+
+Attaches the process to the namespaces associated with the
+FDs in the list of file descriptors returned by
+virDomainLxcOpenNamespace
+
+Returns 0 on success, -1 on error]]></info>
+      <return type='int' info='0 on success, or -1 on error'/>
+      <arg name='domain' type='virDomainPtr' info='a domain object'/>
+      <arg name='fdlist' type='int *' info='list of namespace file descriptors'/>
+      <arg name='flags' type='unsigned int' info='currently unused, pass 0'/>
+    </function>
   </symbols>
 </api>

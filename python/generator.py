@@ -464,6 +464,7 @@ skip_impl = (
 
 lxc_skip_impl = (
     'virDomainLxcOpenNamespace',
+    'virDomainLxcEnterNamespace',
 )
 
 qemu_skip_impl = (
@@ -563,7 +564,6 @@ skip_function = (
 )
 
 lxc_skip_function = (
-  "virDomainLxcEnterNamespace",
   "virDomainLxcEnterSecurityLabel",
 )
 qemu_skip_function = (

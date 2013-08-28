@@ -1061,6 +1061,14 @@ typedef int
                                 int **fdlist,
                                 unsigned int flags);
 
+typedef int
+(*virDrvDomainLxcEnterNamespace)(virDomainPtr domain,
+                                 unsigned int nfdlist,
+                                 int *fdlist,
+                                 unsigned int *noldfdlist,
+                                 int **oldfdlist,
+                                 unsigned int flags);
+
 typedef char *
 (*virDrvDomainMigrateBegin3Params)(virDomainPtr domain,
                                    virTypedParameterPtr params,
@@ -1326,6 +1334,7 @@ struct _virDriver {
     virDrvDomainFSTrim domainFSTrim;
     virDrvDomainSendProcessSignal domainSendProcessSignal;
     virDrvDomainLxcOpenNamespace domainLxcOpenNamespace;
+    virDrvDomainLxcEnterNamespace domainLxcEnterNamespace;
     virDrvDomainMigrateBegin3Params domainMigrateBegin3Params;
     virDrvDomainMigratePrepare3Params domainMigratePrepare3Params;
     virDrvDomainMigratePrepareTunnel3Params domainMigratePrepareTunnel3Params;
