@@ -24,8 +24,6 @@
 #include "viralloc.h"
 #include "virfile.h"
 
-#define VIR_FROM_THIS VIR_FROM_NONE
-
 #ifndef __CYGWIN__
 extern void initlibvirtmod_lxc(void);
 #else
@@ -110,7 +108,6 @@ libvirt_lxc_virDomainLxcEnterNamespace(PyObject *self ATTRIBUTE_UNUSED,
     PyObject *py_retval;
     virDomainPtr domain;
     PyObject *pyobj_domain;
-    PyObject *pyobj_fd;
     PyObject *py_fdlist;
     int c_retval;
     unsigned int nfdlist;
@@ -120,7 +117,7 @@ libvirt_lxc_virDomainLxcEnterNamespace(PyObject *self ATTRIBUTE_UNUSED,
     unsigned int flags;
     size_t i;
 
-    if (!PyArg_ParseTuple(args, (char *)"Oi:virDomainLxcEnterNamespace",
+    if (!PyArg_ParseTuple(args, (char *)"OOi:virDomainLxcEnterNamespace",
                           &pyobj_domain, &py_fdlist, &flags))
         return NULL;
     domain = (virDomainPtr) PyvirDomain_Get(pyobj_domain);
@@ -133,10 +130,11 @@ libvirt_lxc_virDomainLxcEnterNamespace(PyObject *self ATTRIBUTE_UNUSED,
     else
         return VIR_PY_NONE;
 
-    if(VIR_ALLOC_N(fdlist, nfdlist) < 0)
-        goto error;
+    if(VIR_ALLOC_N_QUIET(fdlist, nfdlist) < 0)
+        return PyErr_NoMemory();
  
     for(i = 0; i < nfdlist; i++) {
+        PyObject *pyobj_fd;
         pyobj_fd = PyList_GetItem(py_fdlist, i);
         fdlist[i] = PyInt_AsLong(pyobj_fd);
     }
